@@ -24,4 +24,4 @@ jobs:
           username: monyslim
         run: |
           docker build -t $username/$image_name:$version .
-          docker push $username/$image_name:version
+          docker push $username/$image_name:$version
