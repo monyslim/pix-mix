@@ -1,4 +1,4 @@
-name: CI
+name: CI # this is the name of the workflow
 on:
   push:
     branches:
@@ -11,5 +11,17 @@ jobs:
         uses: actions/checkout@v2
       - name: Greet User
         run: |
-          user="John Doe"
-          echo "Hello $user 👋 you are fine"
+          echo "Welcome"
+      - name: "Logs into Docker Hub Account"
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: "Build the Image"
+        env: 
+          image_name: test-image # Image name variable
+          version: 1.0.0 # Image version variable
+          username: monyslim
+        run: |
+          docker build -t $username/$image_name:$version .
+          docker push $username/$image_name:version
