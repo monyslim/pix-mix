@@ -62,4 +62,4 @@ jobs:
           username: monyslim
         run: |
           docker pull $username/$image_name:$version
-          docker run -d -p 808:80 $username/$image_name
+          docker run -d -p 808:80 $username/$image_name:$version
