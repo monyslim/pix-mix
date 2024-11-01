@@ -10,8 +10,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Greet User
-        run: |
-          echo "Welcome"
+        run: echo "Welcome"
       - name: "Build the Image"
         env: 
           image_name: test-image # Image name variable
@@ -42,7 +41,7 @@ jobs:
 
   Deploy:
     name: Deploy Docker Image
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: Build
     steps:
       - name: Download artifact
