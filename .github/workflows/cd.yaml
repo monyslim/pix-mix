@@ -9,7 +9,7 @@ on:
 jobs:
   Deploy:
     name: Deploy Docker Image
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/pix-mix-tester' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/master' }}
     runs-on: self-hosted
     steps:
       - name: Check for Successful Build
