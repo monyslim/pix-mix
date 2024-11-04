@@ -1,4 +1,5 @@
-name: CI # this is the name of the workflow
+name: CI
+
 on:
   push:
     branches:
@@ -16,7 +17,6 @@ jobs:
       - name: Greet User
         run: echo "Welcome"
 
-      # Generate a version number that is compatible with Docker image tags
       - name: Generate Version Number
         id: version
         run: |
@@ -47,8 +47,7 @@ jobs:
         run: |   
           docker push $username/$image_name:${{ env.APP_VERSION }}
 
-      # Email notification with version number
-      - name: "Send email notification for the latest version of image to be deployed"
+      - name: Send email notification
         uses: dawidd6/action-send-mail@v3
         with:
             server_address: smtp.gmail.com
@@ -79,6 +78,7 @@ jobs:
         env: 
           image_name: test-image
           username: monyslim
+          APP_VERSION: ${{ needs.Build.outputs.version }}
         run: |
           docker pull $username/$image_name:${{ env.APP_VERSION }}
 
@@ -86,11 +86,11 @@ jobs:
         env:
           image_name: test-image
           username: monyslim
+          APP_VERSION: ${{ needs.Build.outputs.version }}
         run: |
-          docker run -d -p 8080:80 $username/$image_name:${{ needs.Build.outputs.version }}
+          docker run -d -p 8080:80 $username/$image_name:${{ env.APP_VERSION }}
 
-      # Email notification with version number
-      - name: "Send email notification for the latest version of image to be deployed"
+      - name: Send email notification
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
