@@ -10,6 +10,8 @@ jobs:
     name: instance-build
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
+    outputs:
+      app_version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -78,7 +80,7 @@ jobs:
         env: 
           image_name: test-image
           username: monyslim
-          APP_VERSION: ${{ needs.Build.outputs.version }}
+          APP_VERSION: ${{ needs.Build.outputs.app_version }}
         run: |
           docker pull $username/$image_name:${{ env.APP_VERSION }}
 
@@ -86,7 +88,7 @@ jobs:
         env:
           image_name: test-image
           username: monyslim
-          APP_VERSION: ${{ needs.Build.outputs.version }}
+          APP_VERSION: ${{ needs.Build.outputs.app_version }}
         run: |
           docker run -d -p 8080:80 $username/$image_name:${{ env.APP_VERSION }}
 
@@ -103,4 +105,4 @@ jobs:
           from: "prcenturionboy@gmail.com"
           body: |
             Hello,
-            The latest version of the Docker image (version: ${{ needs.Build.outputs.version }}) has been deployed.
+            The latest version of the Docker image (version: ${{ needs.Build.outputs.app_version }}) has been deployed.
