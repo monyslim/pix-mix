@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+
 jobs:
   Build:
     name: instance-build
@@ -11,45 +12,42 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+
       - name: Greet User
         run: echo "Welcome"
-      # This action is to print random generated object numbers
-      - name: "Print the Github Object version number"
+
+      # This action generates a random version number
+      - name: Generate Version Number
+        id: version
         run: |
           echo "APP_VERSION=${RANDOM}" >> $GITHUB_ENV
-      - name: "Build the Image"
+          echo "APP_VERSION=${RANDOM}" # Set version output for Deploy job
+          echo "::set-output name=version::${RANDOM}"
+
+      - name: Build the Docker Image
         env:
-          image_name: test-image # Image name variable
-          version: $APP_VERSION # Image version variable
+          image_name: test-image
           username: monyslim
+          APP_VERSION: ${{ steps.version.outputs.version }}
         run: |
           docker build -t $username/$image_name:${{ env.APP_VERSION }} .
-      # - name: Create app_version.txt
-      #   run: |
-      #     echo "Version: $version" > app_version.txt
-      # - name: Upload Artifact
-      #   uses: actions/upload-artifact@v3 # Updated to v3
-      #   with:
-      #     name: app_version # Change to a more generic name
-      #     path: app_version.txt
-      - name: "Logs into Docker Hub Account"
+
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
       - name: Push Docker Image to Docker Hub
         env: 
-          image_name: test-image # Image name variable
-          version: $APP_VERSION # Image version variable
+          image_name: test-image
           username: monyslim
+          APP_VERSION: ${{ steps.version.outputs.version }}
         run: |   
           docker push $username/$image_name:${{ env.APP_VERSION }}
-        # Pass the version number to the next job
-      - name: Set Output Version
-        id: set_version
-        run: echo "::set-output name=version::${{ env.APP_VERSION }}"
-        # This action is to send email notification for the deployment
-      - name: "Send email notification for the latest vesrion of imaged to be deployed"
+
+      # Email notification for the deployment with version number included
+      - name: "Send email notification for the latest version of image to be deployed"
         uses: dawidd6/action-send-mail@v3
         with:
             server_address: smtp.gmail.com
@@ -62,7 +60,7 @@ jobs:
             from: "prcenturionboy@gmail.com"
             body: |
               Hello,
-              The latest version of the Docker image has been deployed.
+              The latest version of the Docker image (version: ${{ steps.version.outputs.version }}) has been deployed.
 
   Deploy:
     name: Deploy Docker Image
@@ -70,31 +68,28 @@ jobs:
     runs-on: self-hosted
     needs: Build
     steps:
-      # - name: Download artifact
-      #   uses: actions/download-artifact@v3 # Update to v3 for consistency
-      #   with:
-      #     name: app_version # Match the name used in upload step
-      #     path: .
-      - name: "Logs into Docker Hub Account"
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
       - name: Pull and Deploy Docker Image
         env: 
-          image_name: test-image # Image name variable
+          image_name: test-image
           username: monyslim
         run: |
           docker pull ${{ env.username }}/${{ env.image_name }}:${{ needs.Build.outputs.version }}
-      - name: Run  Docker Container
+
+      - name: Run Docker Container
         env:
           image_name: test-image
           username: monyslim
         run: |
-          docker run -d -p 808:80 $username/$image_name:${{ needs.Build.outputs.version }}
-      
-    # This action is to send email notification for the deployment
-      - name: "Send email notification for the latest vesrion of imaged to be deployed"
+          docker run -d -p 8080:80 $username/$image_name:${{ needs.Build.outputs.version }}
+
+      # Email notification for the deployment with version number included
+      - name: "Send email notification for the latest version of image to be deployed"
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -107,4 +102,4 @@ jobs:
           from: "prcenturionboy@gmail.com"
           body: |
             Hello,
-            The latest version of the Docker image has been deployed.
+            The latest version of the Docker image (version: ${{ needs.Build.outputs.version }}) has been deployed.
