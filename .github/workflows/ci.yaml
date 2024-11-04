@@ -48,6 +48,21 @@ jobs:
       - name: Set Output Version
         id: set_version
         run: echo "::set-output name=version::${{ env.APP_VERSION }}"
+        # This action is to send email notification for the deployment
+      - name: "Send email notification for the latest vesrion of imaged to be deployed"
+        uses: dawidd6/action-send-mail@v3
+        with:
+            server_address: smtp.gmail.com
+            server_port: 465
+            secure: true
+            username: prcenturionboy@gmail.com
+            password: ${{ secrets.EMAIL_PASSWORD }}
+            subject: "Docker Image Deployed"
+            to: "dewcapontaareh@gmail.com"
+            from: "prcenturionboy@gmail.com"
+            body: |
+              Hello,
+              The latest version of the Docker image has been deployed.
 
   Deploy:
     name: Deploy Docker Image
