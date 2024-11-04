@@ -3,7 +3,7 @@ name: CI Test
 on:
   push:
     branches:
-      - 'another-one/**'
+      - another-one
 
 jobs:
   Build:
@@ -45,4 +45,3 @@ jobs:
           APP_VERSION: ${{ steps.version.outputs.version }}
         run: |
           docker push $username/$image_name:${{ env.APP_VERSION }}
-
