@@ -4,11 +4,12 @@ on:
   push:
     branches:
       - master
+      - 'another-one/**'
 
 jobs:
   Build:
     name: instance-build
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/another-one'
     runs-on: ubuntu-latest
     outputs:
       app_version: ${{ steps.version.outputs.version }}
