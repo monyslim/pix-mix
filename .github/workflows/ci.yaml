@@ -4,11 +4,19 @@ on:
   push:
     branches:
       - master
+<<<<<<< Updated upstream
+=======
+      - another-one
+>>>>>>> Stashed changes
 
 jobs:
   Build:
     name: instance-build
+<<<<<<< Updated upstream
     if: github.ref == 'refs/heads/master'
+=======
+    if: contains(github.ref, 'refs/heads/another-one/')
+>>>>>>> Stashed changes
     runs-on: ubuntu-latest
     outputs:
       app_version: ${{ steps.version.outputs.version }}
@@ -17,7 +25,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Greet User
+<<<<<<< Updated upstream
         run: echo "Welcome"
+=======
+        run: echo "Welcome again"
+>>>>>>> Stashed changes
 
       - name: Generate Version Number
         id: version
@@ -52,6 +64,7 @@ jobs:
       - name: Send email notification
         uses: dawidd6/action-send-mail@v3
         with:
+<<<<<<< Updated upstream
             server_address: smtp.gmail.com
             server_port: 465
             secure: true
@@ -63,6 +76,19 @@ jobs:
             body: |
               Hello,
               The latest version of the Docker image (version: ${{ steps.version.outputs.version }}) has been built.
+=======
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: prcenturionboy@gmail.com
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Docker Image Built"
+          to: "dewcapontaareh@gmail.com"
+          from: "prcenturionboy@gmail.com"
+          body: |
+            Hello,
+            The latest version of the Docker image (version: ${{ steps.version.outputs.version }}) has been built.
+>>>>>>> Stashed changes
 
   Deploy:
     name: Deploy Docker Image
