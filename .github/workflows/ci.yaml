@@ -23,7 +23,7 @@ jobs:
           version: $APP_VERSION # Image version variable
           username: monyslim
         run: |
-          docker build -t $username/$image_name:${{ env.APP_VERSION}} .
+          docker build -t $username/$image_name:${{ env.APP_VERSION }} .
       - name: Create app_version.txt
         run: |
           echo "Version: $version" > app_version.txt
@@ -43,7 +43,7 @@ jobs:
           version: $APP_VERSION # Image version variable
           username: monyslim
         run: |   
-          docker push $username/$image_name:${{ env.APP_VERSION}}
+          docker push $username/$image_name:${{ env.APP_VERSION }}
         # Pass the version number to the next job
       - name: Set Output Version
         id: set_version
