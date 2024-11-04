@@ -9,7 +9,7 @@ on:
 jobs:
   Build:
     name: instance-build
-    if: startsWith(github.ref, 'refs/heads/another-one/')
+    if: github.ref == 'refs/heads/another-one'
     runs-on: ubuntu-latest
     outputs:
       app_version: ${{ steps.version.outputs.version }}
