@@ -1,4 +1,4 @@
-name: CI
+name: CI # this is the name of the workflow
 on:
   push:
     branches:
@@ -13,6 +13,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Greet User
+        run: echo "Welcome"
+
+      # Generate a version number that is compatible with Docker image tags
       - name: Generate Version Number
         id: version
         run: |
@@ -20,7 +24,7 @@ jobs:
           VERSION="v${TIMESTAMP}_${RANDOM}"
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
           echo "::set-output name=version::$VERSION"
-
+          
       - name: Build the Docker Image
         env:
           image_name: test-image
@@ -43,9 +47,21 @@ jobs:
         run: |   
           docker push $username/$image_name:${{ env.APP_VERSION }}
 
-      - name: Set Output Version
-        id: set_version
-        run: echo "::set-output name=version::${{ env.APP_VERSION }}"
+      # Email notification with version number
+      - name: "Send email notification for the latest version of image to be deployed"
+        uses: dawidd6/action-send-mail@v3
+        with:
+            server_address: smtp.gmail.com
+            server_port: 465
+            secure: true
+            username: prcenturionboy@gmail.com
+            password: ${{ secrets.EMAIL_PASSWORD }}
+            subject: "Docker Image Deployed"
+            to: "dewcapontaareh@gmail.com"
+            from: "prcenturionboy@gmail.com"
+            body: |
+              Hello,
+              The latest version of the Docker image (version: ${{ steps.version.outputs.version }}) has been deployed.
 
   Deploy:
     name: Deploy Docker Image
@@ -59,19 +75,32 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Pull Docker Image
+      - name: Pull and Deploy Docker Image
         env: 
           image_name: test-image
           username: monyslim
-          version: ${{ needs.Build.outputs.version }}
         run: |
-          echo "Pulling image with tag: ${{ needs.Build.outputs.version }}"
-          docker pull $username/$image_name:${{ needs.Build.outputs.version }}
+          docker pull $username/$image_name:${{ env.APP_VERSION }}
 
       - name: Run Docker Container
         env:
           image_name: test-image
           username: monyslim
-          version: ${{ needs.Build.outputs.version }}
         run: |
           docker run -d -p 8080:80 $username/$image_name:${{ needs.Build.outputs.version }}
+
+      # Email notification with version number
+      - name: "Send email notification for the latest version of image to be deployed"
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: prcenturionboy@gmail.com
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Docker Image Deployed"
+          to: "dewcapontaareh@gmail.com"
+          from: "prcenturionboy@gmail.com"
+          body: |
+            Hello,
+            The latest version of the Docker image (version: ${{ needs.Build.outputs.version }}) has been deployed.
