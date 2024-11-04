@@ -62,7 +62,7 @@ jobs:
             from: "prcenturionboy@gmail.com"
             body: |
               Hello,
-              The latest version of the Docker image (version: ${{ steps.version.outputs.version }}) has been deployed.
+              The latest version of the Docker image (version: ${{ steps.version.outputs.version }}) has been built.
 
   Deploy:
     name: Deploy Docker Image
@@ -90,7 +90,7 @@ jobs:
           username: monyslim
           APP_VERSION: ${{ needs.Build.outputs.app_version }}
         run: |
-          docker run -d -p 8080:80 $username/$image_name:${{ env.APP_VERSION }}
+          docker run -d -p 8081:80 $username/$image_name:${{ env.APP_VERSION }}
 
       - name: Send email notification
         uses: dawidd6/action-send-mail@v3
