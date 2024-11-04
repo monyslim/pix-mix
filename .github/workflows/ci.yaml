@@ -23,7 +23,7 @@ jobs:
           VERSION="v${TIMESTAMP}_${RANDOM}"
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
           echo "::set-output name=version::$VERSION"
-          
+
       - name: Build the Docker Image
         env:
           image_name: test-image
@@ -39,11 +39,11 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Push Docker Image to Docker Hub
-        env: 
+        env:
           image_name: test-image
           username: monyslim
           APP_VERSION: ${{ steps.version.outputs.version }}
-        run: |   
+        run: |
           docker push $username/$image_name:${{ env.APP_VERSION }}
 
       - name: Print Version
