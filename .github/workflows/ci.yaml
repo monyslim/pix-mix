@@ -9,7 +9,7 @@ on:
 jobs:
   Build:
     name: instance-build
-    if: github.ref == 'refs/heads/another-one'
+    if: contains(github.ref, 'refs/heads/another-one/')
     runs-on: ubuntu-latest
     outputs:
       app_version: ${{ steps.version.outputs.version }}
@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Greet User
-        run: echo "Welcome"
+        run: echo "Welcome again"
 
       - name: Generate Version Number
         id: version
