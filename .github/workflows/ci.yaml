@@ -1,44 +1,23 @@
-name: CI Test
+name: CI
 
 on:
   push:
     branches:
-<<<<<<< HEAD
       - master
-<<<<<<< Updated upstream
-=======
-      - another-one
->>>>>>> Stashed changes
-=======
-      - another-one
->>>>>>> another-one
 
 jobs:
   Build:
     name: instance-build
-<<<<<<< HEAD
-<<<<<<< Updated upstream
     if: github.ref == 'refs/heads/master'
-=======
-    if: contains(github.ref, 'refs/heads/another-one/')
->>>>>>> Stashed changes
-=======
->>>>>>> another-one
     runs-on: ubuntu-latest
+    outputs:
+      app_version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
       - name: Greet User
-<<<<<<< HEAD
-<<<<<<< Updated upstream
         run: echo "Welcome"
-=======
-        run: echo "Welcome again"
->>>>>>> Stashed changes
-=======
-        run: echo "Welcome again to feature branch"
->>>>>>> another-one
 
       - name: Generate Version Number
         id: version
@@ -47,7 +26,7 @@ jobs:
           VERSION="v${TIMESTAMP}_${RANDOM}"
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
           echo "::set-output name=version::$VERSION"
-
+          
       - name: Build the Docker Image
         env:
           image_name: test-image
@@ -63,7 +42,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Push Docker Image to Docker Hub
-<<<<<<< HEAD
         env: 
           image_name: test-image
           username: monyslim
@@ -74,7 +52,6 @@ jobs:
       - name: Send email notification
         uses: dawidd6/action-send-mail@v3
         with:
-<<<<<<< Updated upstream
             server_address: smtp.gmail.com
             server_port: 465
             secure: true
@@ -85,20 +62,7 @@ jobs:
             from: "prcenturionboy@gmail.com"
             body: |
               Hello,
-              The latest version of the Docker image (version: ${{ steps.version.outputs.version }}) has been built.
-=======
-          server_address: smtp.gmail.com
-          server_port: 465
-          secure: true
-          username: prcenturionboy@gmail.com
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "Docker Image Built"
-          to: "dewcapontaareh@gmail.com"
-          from: "prcenturionboy@gmail.com"
-          body: |
-            Hello,
-            The latest version of the Docker image (version: ${{ steps.version.outputs.version }}) has been built.
->>>>>>> Stashed changes
+              The latest version of the Docker image (version: ${{ steps.version.outputs.version }}) has been deployed.
 
   Deploy:
     name: Deploy Docker Image
@@ -121,11 +85,24 @@ jobs:
           docker pull $username/$image_name:${{ env.APP_VERSION }}
 
       - name: Run Docker Container
-=======
->>>>>>> another-one
         env:
           image_name: test-image
           username: monyslim
-          APP_VERSION: ${{ steps.version.outputs.version }}
+          APP_VERSION: ${{ needs.Build.outputs.app_version }}
         run: |
-          docker push $username/$image_name:${{ env.APP_VERSION }}
+          docker run -d -p 8080:80 $username/$image_name:${{ env.APP_VERSION }}
+
+      - name: Send email notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: prcenturionboy@gmail.com
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Docker Image Deployed"
+          to: "dewcapontaareh@gmail.com"
+          from: "prcenturionboy@gmail.com"
+          body: |
+            Hello,
+            The latest version of the Docker image (version: ${{ needs.Build.outputs.app_version }}) has been deployed.
