@@ -46,5 +46,3 @@ jobs:
         run: |
           docker push $username/$image_name:${{ env.APP_VERSION }}
 
-      - name: Print Version
-        run: echo "Version: ${{ steps.version.outputs.version }}"
