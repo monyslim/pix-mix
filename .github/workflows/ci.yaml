@@ -70,7 +70,7 @@ jobs:
           image_name: test-image # Image name variable
           username: monyslim
         run: |
-          docker pull $username/$image_name:$version
+          docker pull $username/$image_name:${{ needs.Build.outputs.version }}
       - name: Run  Docker Container
         env:
           image_name: test-image
